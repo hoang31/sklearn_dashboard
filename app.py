@@ -26,15 +26,38 @@ def table_metrics_numerical_columns(df):
         dash_table.DataTable(
             data_info_numeric.to_dict('records'),
             [{"name": i, "id": i} for i in data_info_numeric.columns],
-            style_header={'textAlign': 'center'},
+            filter_action="native",
+            sort_action="native",
+            sort_mode="multi",
+            column_selectable="single",
+            selected_columns=[],
+            style_header={
+                'textAlign': 'center',
+                'backgroundColor': 'rgb(210, 210, 210)',
+                'color': 'black',
+                'fontWeight': 'bold'
+            },
             style_table={
                         'width': 'auto',
                         'textAlign': 'center',
                         'overflowX': 'auto'
                         },
+            style_cell={'textAlign': 'left'},
+            style_data={
+                        'color': 'black',
+                        'backgroundColor': 'white'
+                        },
+            style_data_conditional=[
+                {
+                    'if': {'row_index': 'odd'},
+                    'backgroundColor': 'rgb(220, 220, 220)',
+                }
+            ],
             fill_width=False
         )
-    ])
+    ],
+    style={'marginLeft': 'auto', 'marginRight': 'auto', 'width': '50%', 'display': 'block'}
+    )
     return data_info_numeric_displayed
 
 
@@ -57,7 +80,7 @@ def table_metrics_categorical_columns(df):
         dt_counting['count_string'] = dt_counting.apply(lambda x: x[col] + ": " + str(x["count"]), axis=1)
 
         ## create dic
-        category_data_count.append(" | ".join(dt_counting['count_string'].tolist()))
+        category_data_count.append("\n".join(dt_counting['count_string'].tolist()))
 
     ## generate the dt
     data = {'columns': cols_category, 'counts': category_data_count}
@@ -68,16 +91,41 @@ def table_metrics_categorical_columns(df):
         dash_table.DataTable(
             data.to_dict('records'),
             [{"name": i, "id": i} for i in data.columns],
-            style_header={'textAlign': 'center'},
+            filter_action="native",
+            sort_action="native",
+            sort_mode="multi",
+            column_selectable="single",
+            selected_columns=[],
+            style_header={
+                'textAlign': 'center',
+                'backgroundColor': 'rgb(210, 210, 210)',
+                'color': 'black',
+                'fontWeight': 'bold'
+            },
             style_table={
                         'width': 'auto',
                         'textAlign': 'center',
                         'overflowX': 'auto'
                         },
-            fill_width=False
-
+            style_cell={
+                'textAlign': 'left',
+                'whiteSpace': 'pre-line'
+            },
+            style_data={
+                        'color': 'black',
+                        'backgroundColor': 'white'
+                        },
+            style_data_conditional=[
+                {
+                    'if': {'row_index': 'odd'},
+                    'backgroundColor': 'rgb(220, 220, 220)',
+                }
+            ],
+            fill_width=True
         )
-    ])
+    ], 
+    #style={'marginLeft': 'auto', 'marginRight': 'auto', 'width': '50%', 'display': 'block'}
+    )
 
     return data_displayed
 
@@ -96,6 +144,7 @@ def get_categorical_columns(df):
 
 def get_models():
     models = [
+        'corr',
         'PCA',
         't-SNE',
         'k-MEANS',
@@ -147,14 +196,24 @@ get_numerical_columns(df)
 # Initialize the app
 #app = Dash()
 app = Dash(external_stylesheets=[dbc.themes.BOOTSTRAP])
+#app = Dash(external_stylesheets=[dbc.themes.CYBORG])
 
 # App layout
 app.layout = dbc.Container([
 
-    html.H1(
-        children='Sklearn Dashboard',
-        style={'textAlign': 'center'}
+    dbc.NavbarSimple(
+        brand="Interactive Sklearn Dashboard",
+        brand_href="#",
+        color="black",
+        dark=True,
+        className="mb-4",
     ),
+
+    #html.H1(
+    #    children='Sklearn Dashboard',
+    #    style={'textAlign': 'center'}
+    #),
+
     html.Br(),
     html.Button('Update', id='update-data-button', n_clicks=0),
     html.Div(id='container-button-timestamp'),
@@ -166,85 +225,120 @@ app.layout = dbc.Container([
         id="tabs-example-graph", value='tab-1-example-graph', 
         children=[
 
-            ## tabs 1
+            ### tabs 1
+            #dcc.Tab(
+            #    label='Data Description',
+            #    value='tab-data-description',
+            #    children=[
+            #        html.Br(),
+            #        html.Br(),
+            #        dbc.Row(
+            #            [
+            #                dbc.Col(html.H2("Data Information - Numerical"), width=4),
+            #                dbc.Col(html.H2("Data Information - Categorical"), width=8),
+            #            ],
+            #        ),
+            #        dbc.Row(
+            #            [
+            #                dbc.Col(table_metrics_numerical_columns(df), width=4),
+            #                dbc.Col(width=1),
+            #                dbc.Col(table_metrics_categorical_columns(df), width=7),
+            #            ],
+            #        ),
+            #            html.Br()
+            #    ]
+            #),
+
+
             dcc.Tab(
                 label='Data Description',
                 value='tab-data-description',
                 children=[
                     html.Br(),
                     html.Br(),
+                    #dbc.Row(
+                    #    [
+                    #        dbc.Col(html.H2("Data Information - Numerical"), width=4),
+                    #        dbc.Col(html.H2("Data Information - Categorical"), width=8),
+                    #    ],
+                    #),
                     dbc.Row(
                         [
-                            dbc.Col(html.H2("Data Information - Numerical"), width=4),
-                            dbc.Col(html.H2("Data Information - Categorical"), width=8),
+                            html.H2("Data Information - Numerical"),
+                            table_metrics_numerical_columns(df),
                         ],
                     ),
+                    html.Br(),
+                    html.Br(),
                     dbc.Row(
                         [
-                            dbc.Col(table_metrics_numerical_columns(df), width=4),
-                            dbc.Col(table_metrics_categorical_columns(df), width=8),
+                            html.H2("Data Information - Categorical"),
+                            table_metrics_categorical_columns(df),
                         ],
                     ),
-                        html.Br()
                 ]
             ),
 
-            ## tabs 2
-            dcc.Tab(
-                label='Data Analysis',
-                value='tab-data-analysis',
-                children=
-                    [
-                        html.Br(),
-                        html.Br(),
-                        dbc.Row(
-                            [   
+
+
+
+
+            ### tabs 2
+            #dcc.Tab(
+            #    label='Data Analysis',
+            #    value='tab-data-analysis',
+            #    children=
+            #        [
+            #            html.Br(),
+            #            html.Br(),
+            #            dbc.Row(
+            #                [   
                                 
-                                dbc.Col(
-                                    dbc.Stack(
-                                        [   
-                                            html.Br(),
-                                            html.Br(),
+            #                    dbc.Col(
+            #                        dbc.Stack(
+            #                            [   
+            #                                html.Br(),
+            #                                html.Br(),
                                             
-                                            html.H3("X-axis"),
-                                            dcc.Dropdown(
-                                                get_numerical_columns(df),
-                                                get_numerical_columns(df)[0],
-                                                multi=False,
-                                                id = "corr-dropdown-x-axis"
-                                            ),
-                                            html.Br(),
-                                            html.Br(),
-                                            html.H3(""),
+            #                                html.H3("X-axis"),
+            #                                dcc.Dropdown(
+            #                                    get_numerical_columns(df),
+            #                                    get_numerical_columns(df)[0],
+            #                                    multi=False,
+            #                                    id = "corr-dropdown-x-axis"
+            #                                ),
+            #                                html.Br(),
+            #                                html.Br(),
+            #                                html.H3(""),
 
-                                            html.H3("Y-axis"),
-                                            dcc.Dropdown(
-                                                get_numerical_columns(df),
-                                                get_numerical_columns(df)[1],
-                                                multi=False,
-                                                id = "corr-dropdown-y-axis"
-                                            ),
-                                        ]
-                                    ),
-                                    width=2
-                                ),
+            #                                html.H3("Y-axis"),
+            #                                dcc.Dropdown(
+            #                                    get_numerical_columns(df),
+            #                                    get_numerical_columns(df)[1],
+            #                                    multi=False,
+            #                                    id = "corr-dropdown-y-axis"
+            #                                ),
+            #                            ]
+            #                        ),
+            #                        width=2
+            #                    ),
 
-                                dbc.Col(width=1),
+            #                    dbc.Col(width=1),
 
-                                dbc.Col(
-                                    dbc.Stack(
-                                        [   
-                                            html.H3("Correlation Plots"),
-                                            dcc.Graph(id='graph-corr-plot'),
+            #                    dbc.Col(
+            #                        dbc.Stack(
+            #                            [   
+            #                                html.H3("Correlation Plots"),
+            #                                dcc.Graph(id='graph-corr-plot'),
                                             
-                                        ]
-                                    ),
-                                    width=9
-                                ),
-                            ],
-                        ),
-                    ]
-            ),
+            #                            ]
+            #                        ),
+            #                        width=9
+            #                    ),
+            #                ],
+            #            ),
+            #        ]
+            #),
 
 
 
@@ -271,6 +365,65 @@ app.layout = dbc.Container([
                         ),
                         html.Br(),
                         html.Br(),
+
+
+
+
+
+
+
+
+                        ###############################################
+                        ## Correlation Analysis
+                        ###############################################
+
+                        #html.H4("Number of Components", id='corr-input-n-values-header', style= {'display': 'block'}),
+
+                        html.H4("X Axis", id='corr-x-axis-header', style= {'display': 'block'}),
+                        html.Div(
+                            [   
+                                dcc.Dropdown(
+                                    get_numerical_columns(df),
+                                    get_numerical_columns(df)[0],
+                                    multi=False,
+                                    id = "corr-x-axis"
+                                ),
+                            ],
+                            style= {'display': 'block'}
+                        ),
+                        html.H4("y Axis", id='corr-y-axis-header', style= {'display': 'block'}),
+                        html.Div(
+                            [   
+                                dcc.Dropdown(
+                                    get_numerical_columns(df),
+                                    get_numerical_columns(df)[0],
+                                    multi=False,
+                                    id = "corr-y-axis"
+                                ),
+                            ],
+                            style= {'display': 'block'}
+                        ),
+                        html.H4("Color by", id='corr-var-to-color-header', style= {'display': 'block'}),
+                        html.Div(
+                            [   
+                                dcc.Dropdown(
+                                    get_categorical_columns(df),
+                                    None,
+                                    multi=False,
+                                    id = "corr-var-to-color"
+                                ),
+                            ],
+                            style= {'display': 'block'}
+                        ),
+                        
+                        html.Div(
+                            [
+                                dcc.Graph(id='corr-graph-corr-plot')
+                            ],
+                            style= {'display': 'block'}
+                        ),
+
+
 
                         ###############################################
                         ## PCA
@@ -442,11 +595,9 @@ def get_all_ids_from_layout(component):
     ## current models list
     models_list = get_models()
     models_list = [model_i.replace('-', "") for model_i in models_list]
-    #print(models_list)
 
     ## filter the ids based on the model list
     ids = [id_i for id_i in ids for model_i in models_list if model_i in id_i]
-
     return ids
 
 all_ids = get_all_ids_from_layout(app.layout)
@@ -538,19 +689,48 @@ def displayClick(btn1):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## ========================
+## Corr
+## ========================
+
+
 @callback(
-    Output('graph-corr-plot', 'figure'),
-    Input('corr-dropdown-x-axis', 'value'),
-    Input('corr-dropdown-y-axis', 'value'),
-    prevent_initial_call=True
+    Output('corr-graph-corr-plot', 'figure'),
+    Input('corr-x-axis', 'value'),
+    Input('corr-y-axis', 'value'),
+    Input('corr-var-to-color', 'value'),
+
+    prevent_initial_call=False
 )
-def generate_correlation_plot(x, y):
+def generate_correlation_plot(x, y, category_var):
     print('GENERATE FIG')
-    fig = px.scatter(df, x=x, y=y, height=800, width=1200, template='simple_white')
+    print(x,y)
+
+    if category_var != None:
+        fig = px.scatter(df, x=x, y=y, height=800, width=1200, template='simple_white', color=df[category_var])
+    else:
+        fig = px.scatter(df, x=x, y=y, height=800, width=1200, template='simple_white')
+
     fig.update_layout(font=dict(size=18))
     fig.update_traces(marker=dict(size=10))
     return fig
-
 
 
 
@@ -762,6 +942,7 @@ def add_general_layout(model_name):
     ## get the output id from the callback context
     output_id_list = ctx.outputs_list
     output_id_list = [id_output['id'] for id_output in output_id_list]
+    print(output_id_list)
 
     ## create the list of content to display
     content_to_display = display_layout(output_id_list, model_name_formatted)
