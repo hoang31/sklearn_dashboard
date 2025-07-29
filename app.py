@@ -209,16 +209,52 @@ app.layout = dbc.Container([
         className="mb-4",
     ),
 
+    ## button for date and time
+    html.Br(),
+    html.Button('Update', id='update-data-button', n_clicks=0),
+    html.Div(id='container-button-timestamp'),
+    html.Br(),
+
+
+
+    html.Div(
+        [
+            #html.Div(style={'height': '50px'}),
+            html.H3(html.B("Upload Data"), style={'textAlign': 'center'}),
+        ],
+        id = 'upload-data-header'
+    ),
+
+    ## let the use upload the data
+    dcc.Upload(
+        id='upload-data',
+        children=html.Div([
+            'Drag and Drop or ',
+            html.A('Select Files')
+        ]),
+        style={
+            'width': '100%',
+            'height': '60px',
+            'lineHeight': '60px',
+            'borderWidth': '1px',
+            'borderStyle': 'dashed',
+            'borderRadius': '5px',
+            'textAlign': 'center',
+            'margin': '10px'
+        },
+        # Allow multiple files to be uploaded
+        multiple=False
+    ),
+    html.Br(),
+    html.Br(),
+
+
+
     #html.H1(
     #    children='Sklearn Dashboard',
     #    style={'textAlign': 'center'}
     #),
 
-    html.Br(),
-    html.Button('Update', id='update-data-button', n_clicks=0),
-    html.Div(id='container-button-timestamp'),
-    html.Br(),
-    html.Br(),
 
 
     dcc.Tabs(
@@ -256,15 +292,10 @@ app.layout = dbc.Container([
                 children=[
                     html.Br(),
                     html.Br(),
-                    #dbc.Row(
-                    #    [
-                    #        dbc.Col(html.H2("Data Information - Numerical"), width=4),
-                    #        dbc.Col(html.H2("Data Information - Categorical"), width=8),
-                    #    ],
-                    #),
+
                     dbc.Row(
                         [
-                            html.H2("Data Information - Numerical"),
+                            html.H2(html.B("Data Information - Numerical"), style={'textAlign': 'center'}),
                             table_metrics_numerical_columns(df),
                         ],
                     ),
@@ -272,79 +303,12 @@ app.layout = dbc.Container([
                     html.Br(),
                     dbc.Row(
                         [
-                            html.H2("Data Information - Categorical"),
+                            html.H2(html.B("Data Information - Categorical"), style={'textAlign': 'center'}),
                             table_metrics_categorical_columns(df),
                         ],
                     ),
                 ]
             ),
-
-
-
-
-
-            ### tabs 2
-            #dcc.Tab(
-            #    label='Data Analysis',
-            #    value='tab-data-analysis',
-            #    children=
-            #        [
-            #            html.Br(),
-            #            html.Br(),
-            #            dbc.Row(
-            #                [   
-                                
-            #                    dbc.Col(
-            #                        dbc.Stack(
-            #                            [   
-            #                                html.Br(),
-            #                                html.Br(),
-                                            
-            #                                html.H3("X-axis"),
-            #                                dcc.Dropdown(
-            #                                    get_numerical_columns(df),
-            #                                    get_numerical_columns(df)[0],
-            #                                    multi=False,
-            #                                    id = "corr-dropdown-x-axis"
-            #                                ),
-            #                                html.Br(),
-            #                                html.Br(),
-            #                                html.H3(""),
-
-            #                                html.H3("Y-axis"),
-            #                                dcc.Dropdown(
-            #                                    get_numerical_columns(df),
-            #                                    get_numerical_columns(df)[1],
-            #                                    multi=False,
-            #                                    id = "corr-dropdown-y-axis"
-            #                                ),
-            #                            ]
-            #                        ),
-            #                        width=2
-            #                    ),
-
-            #                    dbc.Col(width=1),
-
-            #                    dbc.Col(
-            #                        dbc.Stack(
-            #                            [   
-            #                                html.H3("Correlation Plots"),
-            #                                dcc.Graph(id='graph-corr-plot'),
-                                            
-            #                            ]
-            #                        ),
-            #                        width=9
-            #                    ),
-            #                ],
-            #            ),
-            #        ]
-            #),
-
-
-
-
-
-
 
 
 
@@ -367,17 +331,17 @@ app.layout = dbc.Container([
                         html.Br(),
 
 
-
-
-
-
-
-
                         ###############################################
                         ## Correlation Analysis
                         ###############################################
 
-                        #html.H4("Number of Components", id='corr-input-n-values-header', style= {'display': 'block'}),
+                        html.Div(
+                            [
+                                html.H3(html.B("Correlation Analysis")),
+                                html.Div(style={'height': '50px'}),
+                            ],
+                            id = 'corr-header'
+                        ),
 
                         html.H4("X Axis", id='corr-x-axis-header', style= {'display': 'block'}),
                         html.Div(
@@ -415,7 +379,9 @@ app.layout = dbc.Container([
                             ],
                             style= {'display': 'block'}
                         ),
-                        
+                        html.Div([html.Div(style={'height': '20px'})],
+                            id = 'corr-spacer1'
+                        ),
                         html.Div(
                             [
                                 dcc.Graph(id='corr-graph-corr-plot')
@@ -429,6 +395,13 @@ app.layout = dbc.Container([
                         ## PCA
                         ###############################################
 
+                        html.Div(
+                            [
+                                html.H3(html.B("Principal Component Analysis")),
+                                html.Div(style={'height': '50px'}),
+                            ],
+                            id = 'PCA-header'
+                        ),
             
                         html.H4("Number of Components", id='PCA-input-n-values-header', style= {'display': 'block'}),
                         html.Div(
@@ -443,18 +416,8 @@ app.layout = dbc.Container([
                             style= {'display': 'block'}
                         ),
                         html.Div(id='PCA-pc-values', style= {'display': 'block'}),
-                        #html.Div(
-                        #    [
-                        #        html.Br(id='PCA-spacing-1', style= {'display': 'none'}),
-                        #        html.Br(id='PCA-spacing-2',),
-                        #    ],
-                        #    style= {'display': 'none'}
-                        #),
                         html.Br(id='PCA-spacing-1', style= {'display': 'block'}),
                         html.Br(id='PCA-spacing-2', style= {'display': 'block'}),
-
-                        #html.Br(),
-                        #html.Br(),
                         html.H4("Color by", id='PCA-var-to-color-header', style= {'display': 'block'}),
                         html.Div(
                             [   
@@ -467,14 +430,9 @@ app.layout = dbc.Container([
                             ],
                             style= {'display': 'block'}
                         ),
-
-                        #html.Br(),
-                        #html.Br(),
+                        html.Div([html.Div(style={'height': '50px'})], id = 'PCA-spacer1'),
                         html.H4("PCA Visualization", id='PCA-plot-header', style = {'display': 'block'}),
                         html.Div([dcc.Graph(id='PCA-plot')], style= {'display': 'block'}),
-
-                        #html.Br(),
-                        #html.Br(),
                         html.H4("PCA Visualization - Variable Contribution", id='PCA-plot-var-contribution-header', style = {'display': 'block'}),
                         html.Div([dcc.Graph(id='PCA-plot-var-contribution')], style= {'display': 'block'}),
 
@@ -484,8 +442,13 @@ app.layout = dbc.Container([
                         ## T-SNE
                         ###############################################
 
-                        #html.Br(),
-                        #html.Br(),
+                        html.Div(
+                            [
+                                html.H3(html.B("t-SNE")),
+                                html.Div(style={'height': '50px'}),
+                            ],
+                            id = 'tSNE-header'
+                        ),
                         html.H4("Number of t-SNE Components", id='tSNE-input-n-values-header', style= {'display': 'block'}),
                         html.Div(
                             [   
@@ -499,8 +462,6 @@ app.layout = dbc.Container([
                             style= {'display': 'block'}
                         ),
                         html.Div(id='tSNE-pc-values', style= {'display': 'block'}),
-                        #html.Br(),
-                        #html.Br(),
                         html.H4("Color by", id='tSNE-var-to-color-header', style= {'display': 'block'}),
                         html.Div(
                             [   
@@ -513,8 +474,7 @@ app.layout = dbc.Container([
                             ],
                             style= {'display': 'block'}
                         ),
-                        #html.Br(),
-                        #html.Br(),
+                        html.Div([html.Div(style={'height': '50px'})], id = 'tSNE-spacer1'),
                         html.H4("t-SNE Visualization", id='tSNE-plot-header', style = {'display': 'block'}),
                         html.Div([dcc.Graph(id='tSNE-plot')], style= {'display': 'block'}),
 
@@ -523,8 +483,13 @@ app.layout = dbc.Container([
                         ## k-MEANS
                         ###############################################
 
-                        #html.Br(),
-                        #html.Br(),
+                        html.Div(
+                            [
+                                html.H3(html.B("k-Means Clustering")),
+                                html.Div(style={'height': '50px'}),
+                            ],
+                            id = 'kMEANS-header'
+                        ),
                         html.H4("Number of kMEANS", id='kMEANS-input-n-values-header', style= {'display': 'block'}),
                         html.Div(
                             [   
@@ -550,6 +515,7 @@ app.layout = dbc.Container([
                             ],
                             style= {'display': 'block'}
                         ),
+                        html.Div([html.Div(style={'height': '50px'})], id = 'kMEANS-spacer1'),
 
                         html.H4("k-Means Visualization", id='kMEANS-plot-header', style = {'display': 'block'}),
                         html.Div([dcc.Graph(id='kMEANS-plot')], style= {'display': 'block'}),
@@ -564,66 +530,6 @@ app.layout = dbc.Container([
     html.Div(id='tabs-content-example-graph'),
 
 ], fluid=True)
-
-
-
-
-
-
-
-
-
-
-
-
-
-def get_all_ids_from_layout(component):
-    """
-    Recursively extracts all component IDs from a Dash layout - related to the models list
-    """
-    ids = []
-    if hasattr(component, 'id') and component.id is not None:
-        ids.append(component.id)
-
-    if hasattr(component, 'children') and component.children is not None:
-        if isinstance(component.children, list):
-            for child in component.children:
-                ids.extend(get_all_ids_from_layout(child))
-        elif hasattr(component.children, 'id'):  # Single child component
-            ids.extend(get_all_ids_from_layout(component.children))
-
-    ## current models list
-    models_list = get_models()
-    models_list = [model_i.replace('-', "") for model_i in models_list]
-
-    ## filter the ids based on the model list
-    ids = [id_i for id_i in ids for model_i in models_list if model_i in id_i]
-    return ids
-
-all_ids = get_all_ids_from_layout(app.layout)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -670,25 +576,6 @@ def displayClick(btn1):
 
 
 
-#@callback(
-#    Output('tabs-content-example-graph', 'children', allow_duplicate=True),
-#    Input('tabs-example-graph', 'value'),
-#    prevent_initial_call=True
-#)
-#def render_content(tab):
-#    if tab == 'tab-data-description':
-#        output = "ok"
-#        return(output)
-    
-#    elif tab == 'tab-data-analysis':
-#        return html.Div("")
-    
-#    elif tab == 'tab-data-modelling':
-#        return html.Div("")
-
-
-
-
 
 
 
@@ -720,8 +607,7 @@ def displayClick(btn1):
     prevent_initial_call=False
 )
 def generate_correlation_plot(x, y, category_var):
-    print('GENERATE FIG')
-    print(x,y)
+    print('Corr Process')
 
     if category_var != None:
         fig = px.scatter(df, x=x, y=y, height=800, width=1200, template='simple_white', color=df[category_var])
@@ -731,14 +617,6 @@ def generate_correlation_plot(x, y, category_var):
     fig.update_layout(font=dict(size=18))
     fig.update_traces(marker=dict(size=10))
     return fig
-
-
-
-
-
-
-
-
 
 
 ## ========================
@@ -830,17 +708,9 @@ def add_contents_pca(n,category_var):
     return(fig_pca, fig_pca_var_contribution)
 
 
-
-
-
-
-
-
-
-
-
-
-
+## ========================
+## Tsne
+## ========================
 
 
 def run_tsne(df, n, category_var):
@@ -861,7 +731,6 @@ def run_tsne(df, n, category_var):
     tsne_fig = px.scatter(x=tsne_res.loc[:,0], y=tsne_res.loc[:,1], color=df[category_var], height=800, width=1200, template='simple_white')
     
     return(tsne_fig)
-
 
 @callback(
     Output('tSNE-plot', 'figure'),
@@ -898,6 +767,39 @@ def add_contents_tsne(n, category_var):
 
 
 
+
+## ========================
+## Display Layout dynamically
+## ========================
+
+
+def get_all_ids_from_layout(component):
+    """
+    Recursively extracts all component IDs from a Dash layout - related to the models list
+    """
+    ids = []
+    if hasattr(component, 'id') and component.id is not None:
+        ids.append(component.id)
+
+    if hasattr(component, 'children') and component.children is not None:
+        if isinstance(component.children, list):
+            for child in component.children:
+                ids.extend(get_all_ids_from_layout(child))
+        elif hasattr(component.children, 'id'):  # Single child component
+            ids.extend(get_all_ids_from_layout(component.children))
+
+    print(ids)
+    ## current models list
+    models_list = get_models()
+    models_list = [model_i.replace('-', "") for model_i in models_list]
+
+    ## filter the ids based on the model list
+    ids = [id_i for id_i in ids for model_i in models_list if model_i in id_i]
+    return ids
+
+all_ids = get_all_ids_from_layout(app.layout)
+
+
 ## create dict to dynimically display the layout
 def display_layout(output_id_dt, model_name_input):
 
@@ -921,10 +823,6 @@ def display_layout(output_id_dt, model_name_input):
 
     return(list_bool_to_display)
 
-
-
-
-
 @callback(
     [Output(component_id=id_i, component_property='style') for id_i in all_ids],
     Input('modelling-dropdown-model', 'value'),
@@ -942,7 +840,6 @@ def add_general_layout(model_name):
     ## get the output id from the callback context
     output_id_list = ctx.outputs_list
     output_id_list = [id_output['id'] for id_output in output_id_list]
-    print(output_id_list)
 
     ## create the list of content to display
     content_to_display = display_layout(output_id_list, model_name_formatted)
