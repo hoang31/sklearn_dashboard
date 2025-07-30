@@ -17,6 +17,8 @@ df = pd.read_csv('/mnt/Data/perso/kaggle_projects/kaggle_houses_prices/data/hous
 
 def table_metrics_numerical_columns(df):
 
+    print("okkkkkkkkkkkkkkkkkkk")
+
     data_info_numeric = df.describe().T.reset_index()
     data_info_numeric = data_info_numeric.rename(columns={'index' : 'column'})
     data_info_numeric = data_info_numeric.sort_values(by=['column'])
@@ -53,10 +55,10 @@ def table_metrics_numerical_columns(df):
                     'backgroundColor': 'rgb(220, 220, 220)',
                 }
             ],
-            fill_width=False
+            fill_width=True
         )
     ],
-    style={'marginLeft': 'auto', 'marginRight': 'auto', 'width': '50%', 'display': 'block'}
+    style={'marginLeft': 'auto', 'marginRight': 'auto', 'width': '100%', 'display': 'block'}
     )
     return data_info_numeric_displayed
 
@@ -217,43 +219,51 @@ app.layout = dbc.Container([
 
 
 
-    html.Div(
-        [
-            #html.Div(style={'height': '50px'}),
-            html.H3(html.B("Upload Data"), style={'textAlign': 'center'}),
-        ],
-        id = 'upload-data-header'
-    ),
-
-    ## let the use upload the data
-    dcc.Upload(
-        id='upload-data',
-        children=html.Div([
-            'Drag and Drop or ',
-            html.A('Select Files')
-        ]),
-        style={
-            'width': '100%',
-            'height': '60px',
-            'lineHeight': '60px',
-            'borderWidth': '1px',
-            'borderStyle': 'dashed',
-            'borderRadius': '5px',
-            'textAlign': 'center',
-            'margin': '10px'
-        },
-        # Allow multiple files to be uploaded
-        multiple=False
-    ),
-    html.Br(),
-    html.Br(),
-
-
-
-    #html.H1(
-    #    children='Sklearn Dashboard',
-    #    style={'textAlign': 'center'}
+    #html.Div(
+    #    [
+    #        #html.Div(style={'height': '50px'}),
+    #        html.H3(html.B("Upload Data"), style={'textAlign': 'center'}),
+    #    ],
+    #    id = 'upload-data-header'
     #),
+
+
+    html.Div(
+        dbc.Accordion(
+            [
+                dbc.AccordionItem(
+                    [
+                        #html.H3(html.B("Upload your csv file here")),
+                        dcc.Upload(
+                            id='upload-data',
+                            children=html.Div([
+                                'Drag and Drop or ',
+                                html.A('Select Files')
+                            ]),
+                            style={
+                                'width': '100%',
+                                'height': '60px',
+                                'lineHeight': '60px',
+                                'borderWidth': '1px',
+                                'borderStyle': 'dashed',
+                                'borderRadius': '5px',
+                                'textAlign': 'center',
+                                'margin': '10px'
+                            },
+                            # Allow multiple files to be uploaded
+                            multiple=False
+                        ),
+                    ],
+                    title=html.P(html.B("Click Here to Upload CSV Data")),
+                ),
+                
+            ],
+            start_collapsed=True
+        )
+    ),
+
+    html.Br(),
+    html.Br(),
 
 
 
@@ -293,20 +303,43 @@ app.layout = dbc.Container([
                     html.Br(),
                     html.Br(),
 
-                    dbc.Row(
-                        [
-                            html.H2(html.B("Data Information - Numerical"), style={'textAlign': 'center'}),
-                            table_metrics_numerical_columns(df),
-                        ],
+                    html.Div(
+                        dbc.Accordion(
+                            [
+                                dbc.AccordionItem(
+                                    [
+                                        #html.P("This is the content of the first section"),
+                                        html.H2(html.B("Data Information - Numerical"), style={'textAlign': 'center'}),
+                                        table_metrics_numerical_columns(df),
+                                    ],
+                                    title="Description - Numerical",
+                                ),
+                                dbc.AccordionItem(
+                                    [
+                                        html.H2(html.B("Data Information - Categorical"), style={'textAlign': 'center'}),
+                                        table_metrics_categorical_columns(df),
+                                    ],
+                                    title="Description - Categorical",
+                                ),
+                            ],
+                            start_collapsed=True,
+                        )
                     ),
-                    html.Br(),
-                    html.Br(),
-                    dbc.Row(
-                        [
-                            html.H2(html.B("Data Information - Categorical"), style={'textAlign': 'center'}),
-                            table_metrics_categorical_columns(df),
-                        ],
-                    ),
+
+                    #dbc.Row(
+                    #    [
+                    #        html.H2(html.B("Data Information - Numerical"), style={'textAlign': 'center'}),
+                    #        table_metrics_numerical_columns(df),
+                    #    ],
+                    #),
+                    #html.Br(),
+                    #html.Br(),
+                    #dbc.Row(
+                    #    [
+                    #        html.H2(html.B("Data Information - Categorical"), style={'textAlign': 'center'}),
+                    #        table_metrics_categorical_columns(df),
+                    #    ],
+                    #),
                 ]
             ),
 
@@ -329,7 +362,8 @@ app.layout = dbc.Container([
                         ),
                         html.Br(),
                         html.Br(),
-
+                        
+                        html.Hr(),
 
                         ###############################################
                         ## Correlation Analysis
@@ -519,13 +553,77 @@ app.layout = dbc.Container([
 
                         html.H4("k-Means Visualization", id='kMEANS-plot-header', style = {'display': 'block'}),
                         html.Div([dcc.Graph(id='kMEANS-plot')], style= {'display': 'block'}),
-
-
-
-
-
                     ]
             ),
+            
+            
+            
+            
+            
+            
+            
+            
+            dcc.Tab(
+                label='Classification Modelling',
+                value='tab-classification-modelling',
+                children=[
+                    html.Div([html.Div(style={'height': '50px'})]),
+                    html.Hr(),
+                    html.Br(),
+
+                    html.Div([
+                        dbc.Row([
+                            dbc.Col(html.H4("Split Data to Train/Test Set"), width=3),
+                            dbc.Col(
+                                dcc.Input(
+                                    id = 'split-data-input',
+                                    placeholder='Training Set Proportion',
+                                    type='text',
+                                    value='0.8'
+                                ),
+                                width=1
+                            ),
+                            dbc.Col(width=10),
+                        ]),
+                    ]),
+
+                    html.Br(),
+                    html.Hr(),
+                    html.Br(),
+
+
+                    dcc.Checklist(
+                        ['Cross Validation', 'Stratified Cross Validation', ' Leave-One-Out Cross-Validation'],
+                        ['Cross Validation'],
+                        id='cross-validation-checklist',
+                        inline=False
+                    ),
+
+                    html.Br(),
+                    html.Hr(),
+                    html.Br(),
+
+                    html.Div([
+                        dbc.Row([
+                            dbc.Col(html.H4("Training Set",  style={'textAlign': 'center'}), width=6),
+                            dbc.Col(html.H4("Testing Set",  style={'textAlign': 'center'}), width=6),
+
+                        ]),
+
+                    ]),
+
+
+
+
+
+
+                ]
+            ),
+
+
+
+
+
         ]),
     html.Div(id='tabs-content-example-graph'),
 
@@ -788,7 +886,6 @@ def get_all_ids_from_layout(component):
         elif hasattr(component.children, 'id'):  # Single child component
             ids.extend(get_all_ids_from_layout(component.children))
 
-    print(ids)
     ## current models list
     models_list = get_models()
     models_list = [model_i.replace('-', "") for model_i in models_list]
