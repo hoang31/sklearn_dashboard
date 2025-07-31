@@ -7,6 +7,15 @@ import dash_bootstrap_components as dbc
 import plotly.io as pio
 
 
+from sklearn.decomposition import PCA
+from sklearn.preprocessing import StandardScaler
+from sklearn import preprocessing
+from sklearn.cluster import KMeans
+from sklearn.preprocessing import LabelEncoder
+
+
+
+
 # Incorporate data
 df = pd.read_csv('/mnt/Data/perso/kaggle_projects/kaggle_houses_prices/data/house-prices-advanced-regression-techniques/train.csv')
 #df = pd.read_csv('/mnt/Data/perso/kaggle_projects/kaggle__World_Bank_Dataset/workflow/data/world_bank_dataset.csv')
@@ -271,30 +280,6 @@ app.layout = dbc.Container([
         id="tabs-example-graph", value='tab-1-example-graph', 
         children=[
 
-            ### tabs 1
-            #dcc.Tab(
-            #    label='Data Description',
-            #    value='tab-data-description',
-            #    children=[
-            #        html.Br(),
-            #        html.Br(),
-            #        dbc.Row(
-            #            [
-            #                dbc.Col(html.H2("Data Information - Numerical"), width=4),
-            #                dbc.Col(html.H2("Data Information - Categorical"), width=8),
-            #            ],
-            #        ),
-            #        dbc.Row(
-            #            [
-            #                dbc.Col(table_metrics_numerical_columns(df), width=4),
-            #                dbc.Col(width=1),
-            #                dbc.Col(table_metrics_categorical_columns(df), width=7),
-            #            ],
-            #        ),
-            #            html.Br()
-            #    ]
-            #),
-
 
             dcc.Tab(
                 label='Data Description',
@@ -326,20 +311,6 @@ app.layout = dbc.Container([
                         )
                     ),
 
-                    #dbc.Row(
-                    #    [
-                    #        html.H2(html.B("Data Information - Numerical"), style={'textAlign': 'center'}),
-                    #        table_metrics_numerical_columns(df),
-                    #    ],
-                    #),
-                    #html.Br(),
-                    #html.Br(),
-                    #dbc.Row(
-                    #    [
-                    #        html.H2(html.B("Data Information - Categorical"), style={'textAlign': 'center'}),
-                    #        table_metrics_categorical_columns(df),
-                    #    ],
-                    #),
                 ]
             ),
 
@@ -353,29 +324,42 @@ app.layout = dbc.Container([
                     [
                         html.Br(),
                         html.Br(),
-                        html.H3("Choose Model"),
-                        dcc.Dropdown(
-                            get_models(),
-                            None,
-                            multi=False,
-                            id = "modelling-dropdown-model"
+                        html.Br(),
+
+                        dbc.Card(
+                            [
+                                html.P(""),
+                                html.H3("Choose Model", style={'textAlign': 'center'}),
+                                dcc.Dropdown(
+                                    get_models(),
+                                    None,
+                                    multi=False,
+                                    id = "modelling-dropdown-model"
+                                ),
+                                html.P(""),
+                            ]
                         ),
                         html.Br(),
-                        html.Br(),
-                        
-                        html.Hr(),
+                        html.Br(),                        
+                        html.Br(),                        
+                        html.Br(),                        
+
+                        #html.Hr(),
+
 
                         ###############################################
                         ## Correlation Analysis
                         ###############################################
 
+
                         html.Div(
                             [
-                                html.H3(html.B("Correlation Analysis")),
-                                html.Div(style={'height': '50px'}),
+                                html.H3(html.B("Correlation Analysis"), style = {'textAlign': 'center'}),
+                                html.Div(style={'height': '30px'}),
                             ],
                             id = 'corr-header'
                         ),
+
 
                         html.H4("X Axis", id='corr-x-axis-header', style= {'display': 'block'}),
                         html.Div(
@@ -424,15 +408,14 @@ app.layout = dbc.Container([
                         ),
 
 
-
                         ###############################################
                         ## PCA
                         ###############################################
 
                         html.Div(
                             [
-                                html.H3(html.B("Principal Component Analysis")),
-                                html.Div(style={'height': '50px'}),
+                                html.H3(html.B("Principal Component Analysis"), style = {'textAlign': 'center'}),
+                                html.Div(style={'height': '30px'}),
                             ],
                             id = 'PCA-header'
                         ),
@@ -478,8 +461,8 @@ app.layout = dbc.Container([
 
                         html.Div(
                             [
-                                html.H3(html.B("t-SNE")),
-                                html.Div(style={'height': '50px'}),
+                                html.H3(html.B("t-SNE"), style = {'textAlign': 'center'}),
+                                html.Div(style={'height': '30px'}),
                             ],
                             id = 'tSNE-header'
                         ),
@@ -519,8 +502,8 @@ app.layout = dbc.Container([
 
                         html.Div(
                             [
-                                html.H3(html.B("k-Means Clustering")),
-                                html.Div(style={'height': '50px'}),
+                                html.H3(html.B("k-Means Clustering"), style = {'textAlign': 'center'}),
+                                html.Div(style={'height': '30px'}),
                             ],
                             id = 'kMEANS-header'
                         ),
@@ -549,8 +532,34 @@ app.layout = dbc.Container([
                             ],
                             style= {'display': 'block'}
                         ),
-                        html.Div([html.Div(style={'height': '50px'})], id = 'kMEANS-spacer1'),
 
+                        html.H4("X Axis", id='kMEANS-x-axis-header', style= {'display': 'block'}),
+                        html.Div(
+                            [   
+                                dcc.Dropdown(
+                                    get_numerical_columns(df),
+                                    get_numerical_columns(df)[0],
+                                    multi=False,
+                                    id = "kMEANS-x-axis"
+                                ),
+                            ],
+                            style= {'display': 'block'}
+                        ),
+                        html.H4("y Axis", id='kMEANS-y-axis-header', style= {'display': 'block'}),
+                        html.Div(
+                            [   
+                                dcc.Dropdown(
+                                    get_numerical_columns(df),
+                                    get_numerical_columns(df)[1],
+                                    multi=False,
+                                    id = "kMEANS-y-axis"
+                                ),
+                            ],
+                            style= {'display': 'block'}
+                        ),
+
+
+                        html.Div([html.Div(style={'height': '50px'})], id = 'kMEANS-spacer1'),
                         html.H4("k-Means Visualization", id='kMEANS-plot-header', style = {'display': 'block'}),
                         html.Div([dcc.Graph(id='kMEANS-plot')], style= {'display': 'block'}),
                     ]
@@ -558,6 +567,20 @@ app.layout = dbc.Container([
             
             
             
+
+
+
+
+
+
+
+
+
+
+
+
+
+
             
             
             
@@ -568,40 +591,56 @@ app.layout = dbc.Container([
                 value='tab-classification-modelling',
                 children=[
                     html.Div([html.Div(style={'height': '50px'})]),
-                    html.Hr(),
+                    #html.Hr(),
                     html.Br(),
 
-                    html.Div([
-                        dbc.Row([
-                            dbc.Col(html.H4("Split Data to Train/Test Set"), width=3),
-                            dbc.Col(
-                                dcc.Input(
-                                    id = 'split-data-input',
-                                    placeholder='Training Set Proportion',
-                                    type='text',
-                                    value='0.8'
-                                ),
-                                width=1
+
+                    html.Div(
+                        [
+                            dbc.Card(
+                                [
+                                    html.P(""),
+                                    html.Div([
+                                        dbc.Row([
+                                            dbc.Col(html.H4("Split Data to Train/Test Set"), width=3),
+                                            dbc.Col(
+                                                dcc.Input(
+                                                    id = 'split-data-input',
+                                                    placeholder='Training Set Proportion',
+                                                    type='text',
+                                                    value='0.8'
+                                                ),
+                                                width=1
+                                            ),
+                                            dbc.Col(width=10),
+                                        ]),
+                                    ]),
+                                    html.P(""),
+
+                                ],
+                                className="mb-3",
                             ),
-                            dbc.Col(width=10),
-                        ]),
-                    ]),
-
-                    html.Br(),
-                    html.Hr(),
-                    html.Br(),
-
-
-                    dcc.Checklist(
-                        ['Cross Validation', 'Stratified Cross Validation', ' Leave-One-Out Cross-Validation'],
-                        ['Cross Validation'],
-                        id='cross-validation-checklist',
-                        inline=False
+                            dbc.Card(
+                                [
+                                    html.P(""),
+                                    dcc.Checklist(
+                                        ['Cross Validation', 'Stratified Cross Validation', ' Leave-One-Out Cross-Validation'],
+                                        ['Cross Validation'],
+                                        id='cross-validation-checklist',
+                                        inline=False
+                                    ),
+                                    html.P(""),
+                                ],
+                                className="mb-3",
+                            ),
+                            #dbc.Card("This is also within a body", body=True),
+                        ]
                     ),
 
+
                     html.Br(),
-                    html.Hr(),
-                    html.Br(),
+                    #html.Hr(),
+                    #html.Br(),
 
                     html.Div([
                         dbc.Row([
@@ -701,7 +740,6 @@ def displayClick(btn1):
     Input('corr-x-axis', 'value'),
     Input('corr-y-axis', 'value'),
     Input('corr-var-to-color', 'value'),
-
     prevent_initial_call=False
 )
 def generate_correlation_plot(x, y, category_var):
@@ -729,8 +767,7 @@ def run_impute_nan(df):
 
 def run_pca(df, n_pc, category_var):
     
-    from sklearn.decomposition import PCA
-    from sklearn.preprocessing import StandardScaler
+
 
     print('PCA process')
 
@@ -843,6 +880,74 @@ def add_contents_tsne(n, category_var):
     fig_tse = run_tsne(df, n, category_var)
 
     return(fig_tse)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## ========================
+## kmean
+## ========================
+
+from sklearn.preprocessing import OneHotEncoder
+
+
+def run_kmeans(df, n, category_var, x, y):
+
+    print('kmeans process')
+
+
+    label_encoder = LabelEncoder()
+    df_normalized = OneHotEncoder().fit_transform(df)
+    df_normalized = preprocessing.normalize(df_normalized)
+
+
+    ## run kmeans
+    kmeans = KMeans(n_clusters = n, random_state = 0, n_init='auto')
+    kmeans_res = kmeans.fit(df_normalized)
+    df['kmeans_clusters'] = (kmeans_res.labels_).astype(str).tolist()
+
+    ## generate the fig
+    kmeans_fig = px.scatter(df, x=x, y=y, color='kmeans_clusters' , height=800, width=1200, template='simple_white')
+
+    return(kmeans_fig)
+
+
+    
+
+@callback(
+    Output('kMEANS-plot', 'figure'),
+    Input('kMEANS-input-n-values', 'value'),
+    Input('kMEANS-var-to-color', 'value'),
+    Input('kMEANS-x-axis', 'value'),
+    Input('kMEANS-y-axis', 'value'),
+    prevent_initial_call=True
+)
+
+def add_contents_kMMEANS(n, category_var, x, y):
+
+    ## Run the pca
+    fig_keams = run_kmeans(df, n, category_var, x, y)
+
+    return(fig_keams)
+
 
 
 
