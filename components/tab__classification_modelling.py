@@ -3,6 +3,7 @@ from dash import Dash, html, dash_table, dcc, callback, Output, Input, ctx, call
 import pandas as pd
 import dash_bootstrap_components as dbc
 
+
 def tab__classification_modelling(df):
     tab_content = dcc.Tab(
         label='Classification Modelling',
